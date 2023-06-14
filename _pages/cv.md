@@ -11,7 +11,9 @@ redirect_from:
 
 Education
 ======
-* B.A. in Healthcare Structure & EMS Research, Biochemistry Minor, University of Vermont, May 2020
+* MD, Perelman School of Medicine, University of Pennsylvania, Expected May 2030
+* PhD - Epidemiology, University of Pennsylvania, Expected May 2028
+* BA - Healthcare Structure & EMS Research, Biochemistry Minor, University of Vermont, May 2020
   * Relevant Coursework: Public Health Communication; Statistical Methods I/II; Philosophy: Medical Ethics; Healthcare Structure; Emergency Medicine Research; Molecular Biology; Biochemistry; Biostatistics; Race & Racism in the USA
   * Dean’s List: Spring 2017; Fall 2018; Spring 2019; Fall 2019; Spring 2020
   * Honors: Graduated with College Honors; Elmer Nicholson Achievement Prize for Outstanding Student Leadership; Nu Gamma Outstanding Community Advocate Award; Andrew “PJ” Kaspirin Service Award; Boulder Honor Society; Order of Omega Honor Society; Gamma Sigma Alpha Honor Society
