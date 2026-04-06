@@ -12,9 +12,10 @@ redirect_from:
 Education
 ======
 * MD, Perelman School of Medicine, University of Pennsylvania, Expected May 2030
-  * Campus Involvement and Leadership: Peer Mentor: UpLIFT (2023-2024); Admissions Student Interviewer (2023-2024); CHOP Family Connects Volunteer (2024); CUT Hypertension Clinic Volunteer (2023-2024)
+  * Campus Involvement and Leadership: CUT Hypertension Clinic Volunteer (2023-2024); Peer Mentor: UpLIFT (2023-Present); Admissions Student Interviewer (2023-Present); CHOP Family Connects Volunteer (2024-Present); PSOM UMEC Program Evaluation Committee member (2025-Present); Emergency Medicine Interest Group executive board (2025-Present); Penn MSTP Retreat Planning Committee (2025-Present); Penn Med Votes organizing committee (2025-Present)
+  * Honors: Gold Humanism Honor Society (GHHS); Fontaine Society; MSPE Accolade for Exceptional Professionalism
 * PhD - Epidemiology, University of Pennsylvania, Expected May 2028
-* BA - Healthcare Structure & EMS Research, Biochemistry Minor, University of Vermont, May 2020
+* BA - Individually Designed: Healthcare Structure & EMS Research, Biochemistry Minor, University of Vermont, May 2020
   * Relevant Coursework: Public Health Communication; Statistical Methods I/II; Philosophy: Medical Ethics; Healthcare Structure; Emergency Medicine Research; Molecular Biology; Biochemistry; Biostatistics; Race & Racism in the USA
   * Dean’s List: Spring 2017; Fall 2018; Spring 2019; Fall 2019; Spring 2020
   * Honors: Graduated with College Honors; Elmer Nicholson Achievement Prize for Outstanding Student Leadership; Nu Gamma Outstanding Community Advocate Award; Andrew “PJ” Kaspirin Service Award; Boulder Honor Society; Order of Omega Honor Society; Gamma Sigma Alpha Honor Society
