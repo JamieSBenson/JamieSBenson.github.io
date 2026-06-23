@@ -1,160 +1,241 @@
 #!/usr/bin/env python
 # coding: utf-8
+"""
+Publication markdown generator for academicpages, driven by a Zotero
+(Better BibTeX) .bib export.
 
-# # Publications markdown generator for academicpages
-# 
-# Takes a set of bibtex of publications and converts them for use with [academicpages.github.io](academicpages.github.io). This is an interactive Jupyter notebook ([see more info here](http://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/what_is_jupyter.html)). 
-# 
-# The core python code is also in `pubsFromBibs.py`. 
-# Run either from the `markdown_generator` folder after replacing updating the publist dictionary with:
-# * bib file names
-# * specific venue keys based on your bib file preferences
-# * any specific pre-text for specific files
-# * Collection Name (future feature)
-# 
-# TODO: Make this work with other databases of citations, 
-# TODO: Merge this with the existing TSV parsing solution
+Workflow
+--------
+1.  In Zotero, keep your own publications in one collection. With the
+    Better BibTeX plugin, right-click the collection -> "Export Collection"
+    -> format "Better BibTeX", check "Keep updated". Point it at
+    ``zotero_publications.bib`` in the repo root. The file now refreshes
+    automatically whenever you add a paper.
+2.  Run this script from the repo root:  ``python markdown_generator/pubsFromBib.py``
+3.  Commit the new/changed files in ``_publications/``.
 
+Design choices
+--------------
+* Citations are rendered in a single consistent **AMA** style.
+* Your name (``Benson``) is bolded in every citation.
+* ``@incollection`` (book chapters) are handled, not just journal articles.
+* Each generated file records ``doi`` and ``zotero_key`` in its front matter.
+* DEDUP: before writing, the script scans existing ``_publications/*.md``.
+  If a file already references the same ``zotero_key`` or ``doi``, the entry
+  is SKIPPED. This (a) prevents duplicate pages like the old mammography
+  double-entry, and (b) preserves any short, hand-curated permalinks/slugs
+  you have already created. Only genuinely new papers are written. Delete a
+  file if you want it regenerated.
 
-from pybtex.database.input import bibtex
-import pybtex.database.input.bibtex 
-from time import strptime
-import string
-import html
+Requires: ``pip install bibtexparser``
+"""
+
 import os
 import re
+import sys
+import glob
+import bibtexparser
+from bibtexparser.bparser import BibTexParser
 
-#todo: incorporate different collection types rather than a catch all publications, requires other changes to template
-publist = {
-    "proceeding": {
-        "file" : "proceedings.bib",
-        "venuekey": "booktitle",
-        "venue-pretext": "In the proceedings of ",
-        "collection" : {"name":"publications",
-                        "permalink":"/publication/"}
-        
-    },
-    "journal":{
-        "file": "pubs.bib",
-        "venuekey" : "journal",
-        "venue-pretext" : "",
-        "collection" : {"name":"publications",
-                        "permalink":"/publication/"}
-    } 
+# --- paths (robust to being run from repo root or markdown_generator/) -------
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
+BIB = os.path.join(REPO, "zotero_publications.bib")
+PUBDIR = os.path.join(REPO, "_publications")
+
+# Your surname, as it appears in the bib, to bold + standardize.
+MY_LASTNAME = "Benson"
+MY_INITIALS = "JS"
+
+# Journals whose indexed title is unwieldy -> cleaner display name.
+JOURNAL_CLEAN = {
+    "Medical Decision Making: An International Journal of the Society for "
+    "Medical Decision Making": "Medical Decision Making",
 }
 
-html_escape_table = {
-    "&": "&amp;",
-    '"': "&quot;",
-    "'": "&apos;"
-    }
 
-def html_escape(text):
-    """Produce entities within text."""
-    return "".join(html_escape_table.get(c,c) for c in text)
+# ---------------------------------------------------------------------------
+def delatex(s):
+    """Strip BibTeX/LaTeX cruft and normalize punctuation/quotes."""
+    if not s:
+        return ""
+    s = s.replace("``", '"').replace("''", '"')
+    s = (s.replace("\\&", "&").replace("$\\geq$", "≥")
+           .replace("$<$", "<").replace("$>$", ">").replace("\\$", "$"))
+    s = re.sub(r"\\textsc\s*", "", s)
+    s = re.sub(r"\\[a-zA-Z]+\s*", "", s)        # drop remaining \commands
+    s = s.replace("{", "").replace("}", "")
+    s = re.sub(r"\s+([:;.,?!])", r"\1", s)       # no space before punctuation
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
 
 
-for pubsource in publist:
-    parser = bibtex.Parser()
-    bibdata = parser.parse_file(publist[pubsource]["file"])
+def initials(firsts):
+    out = ""
+    for tok in re.split(r"[\s.]+", firsts):
+        tok = tok.strip("{}")
+        if tok:
+            out += tok[0].upper()
+    return out
 
-    #loop through the individual references in a given bibtex file
-    for bib_id in bibdata.entries:
-        #reset default date
-        pub_year = "1900"
-        pub_month = "01"
-        pub_day = "01"
-        
-        b = bibdata.entries[bib_id].fields
-        
-        try:
-            pub_year = f'{b["year"]}'
 
-            #todo: this hack for month and day needs some cleanup
-            if "month" in b.keys(): 
-                if(len(b["month"])<3):
-                    pub_month = "0"+b["month"]
-                    pub_month = pub_month[-2:]
-                elif(b["month"] not in range(12)):
-                    tmnth = strptime(b["month"][:3],'%b').tm_mon   
-                    pub_month = "{:02d}".format(tmnth) 
-                else:
-                    pub_month = str(b["month"])
-            if "day" in b.keys(): 
-                pub_day = str(b["day"])
+def fmt_authors(author_field):
+    """Render an AMA author list; bold the site owner; cap at 6 (+ et al.)."""
+    persons = [p for p in re.split(r"\s+and\s+", author_field)]
+    names = []
+    for p in persons:
+        p = p.strip()
+        if "," in p:
+            last, first = p.split(",", 1)
+        elif " " in p:
+            first, last = p.rsplit(" ", 1)
+        else:
+            last, first = p, ""
+        last, ini = delatex(last), initials(delatex(first))
+        if last == MY_LASTNAME:
+            names.append((MY_LASTNAME, MY_INITIALS, True))
+        elif "broek-altenburg" in last.lower():          # collapse name variants
+            names.append(("Van Den Broek-Altenburg", "EM", False))
+        else:
+            names.append((last, ini, False))
 
-                
-            pub_date = pub_year+"-"+pub_month+"-"+pub_day
-            
-            #strip out {} as needed (some bibtex entries that maintain formatting)
-            clean_title = b["title"].replace("{", "").replace("}","").replace("\\","").replace(" ","-")    
+    def render(n):
+        s = f"{n[0]} {n[1]}".strip()
+        return f"**{s}**" if n[2] else s
 
-            url_slug = re.sub("\\[.*\\]|[^a-zA-Z0-9_-]", "", clean_title)
-            url_slug = url_slug.replace("--","-")
+    if len(names) > 6:
+        shown = names[:3]
+        if not any(n[2] for n in shown):     # always keep the owner visible
+            for n in names[3:]:
+                if n[2]:
+                    shown = names[:2] + [n]
+                    break
+        return ", ".join(render(n) for n in shown) + ", et al."
+    return ", ".join(render(n) for n in names)
 
-            md_filename = (str(pub_date) + "-" + url_slug + ".md").replace("--","-")
-            html_filename = (str(pub_date) + "-" + url_slug).replace("--","-")
 
-            #Build Citation from text
-            citation = ""
+def _join(a, b):
+    a = a.rstrip()
+    return (a + " " + b) if a.endswith((".", "?", "!")) else (a + ". " + b)
 
-            #citation authors - todo - add highlighting for primary author?
-            for author in bibdata.entries[bib_id].persons["author"]:
-                citation = citation+" "+author.first_names[0]+" "+author.last_names[0]+", "
 
-            #citation title
-            citation = citation + "\"" + html_escape(b["title"].replace("{", "").replace("}","").replace("\\","")) + ".\""
+def build_citation(e):
+    """Return (citation, venue, doi) in AMA style for a bibtexparser entry."""
+    authors = fmt_authors(e["author"])
+    title = delatex(e["title"]).rstrip(".")
+    venue = delatex(e.get("journal") or e.get("booktitle", ""))
+    venue = JOURNAL_CLEAN.get(venue, venue)
+    year = e.get("year", "")
+    vol = e.get("volume")
+    num = e.get("number")
+    pages = (e.get("pages", "") or "").replace("--", "-")
+    if "-" in pages:
+        lo, hi = pages.split("-", 1)
+        if lo == hi:
+            pages = lo
+    doi = e.get("doi")
 
-            #add venue logic depending on citation type
-            venue = publist[pubsource]["venue-pretext"]+b[publist[pubsource]["venuekey"]].replace("{", "").replace("}","").replace("\\","")
+    if e.get("ENTRYTYPE") == "incollection":
+        tail = f"In: {venue}. {e.get('publisher', '')}; {year}:{pages}.".replace("  ", " ")
+    elif vol:
+        vip = f"{vol}" + (f"({num})" if num else "") + (f":{pages}" if pages else "")
+        tail = f"{venue}. {year};{vip}."
+    else:
+        mon = e.get("month", "").capitalize()
+        tail = f"{venue}. Published online {mon} {year}.".replace("  ", " ")
 
-            citation = citation + " " + html_escape(venue)
-            citation = citation + ", " + pub_year + "."
+    cite = _join(_join(authors, title), tail)
+    if doi:
+        cite += f" doi:{doi}"
+    return re.sub(r"\s+", " ", cite).strip(), venue, doi
 
-            
-            ## YAML variables
-            md = "---\ntitle: \""   + html_escape(b["title"].replace("{", "").replace("}","").replace("\\","")) + '"\n'
-            
-            md += """collection: """ +  publist[pubsource]["collection"]["name"]
 
-            md += """\npermalink: """ + publist[pubsource]["collection"]["permalink"]  + html_filename
-            
-            note = False
-            if "note" in b.keys():
-                if len(str(b["note"])) > 5:
-                    md += "\nexcerpt: '" + html_escape(b["note"]) + "'"
-                    note = True
+def slugify(title):
+    s = re.sub(r"[^a-zA-Z0-9\s-]", "", delatex(title)).lower()
+    words = [w for w in s.split() if w][:6]
+    return "-".join(words)
 
-            md += "\ndate: " + str(pub_date) 
 
-            md += "\nvenue: '" + html_escape(venue) + "'"
-            
-            url = False
-            if "url" in b.keys():
-                if len(str(b["url"])) > 5:
-                    md += "\npaperurl: '" + b["url"] + "'"
-                    url = True
+def existing_keys_and_dois():
+    keys, dois = set(), set()
+    for fn in glob.glob(os.path.join(PUBDIR, "*.md")):
+        txt = open(fn, encoding="utf-8").read()
+        m = re.search(r"(?m)^zotero_key:\s*'?([^'\n]+)", txt)
+        if m:
+            keys.add(m.group(1).strip())
+        for m in re.finditer(r"10\.\d{4,9}/[^\s'\")]+", txt):   # any DOI anywhere
+            dois.add(m.group(0).strip().lower())
+    return keys, dois
 
-            md += "\ncitation: '" + html_escape(citation) + "'"
 
-            md += "\n---"
+def month_to_num(mraw):
+    if not mraw:
+        return "01"
+    from time import strptime
+    try:
+        return "%02d" % strptime(mraw[:3], "%b").tm_mon
+    except ValueError:
+        return mraw.zfill(2)[-2:]
 
-            
-            ## Markdown description for individual page
-            if note:
-                md += "\n" + html_escape(b["note"]) + "\n"
 
-            if url:
-                md += "\n[Access paper here](" + b["url"] + "){:target=\"_blank\"}\n" 
-            else:
-                md += "\nUse [Google Scholar](https://scholar.google.com/scholar?q="+html.escape(clean_title.replace("-","+"))+"){:target=\"_blank\"} for full citation"
+def main():
+    if not os.path.exists(BIB):
+        sys.exit(f"Bib file not found: {BIB}")
+    parser = BibTexParser(common_strings=True)
+    parser.ignore_nonstandard_types = False
+    with open(BIB, encoding="utf-8") as f:
+        db = bibtexparser.load(f, parser=parser)
 
-            md_filename = os.path.basename(md_filename)
+    seen_keys, seen_dois = existing_keys_and_dois()
+    created = skipped = 0
 
-            with open("../_publications/" + md_filename, 'w') as f:
-                f.write(md)
-            print(f'SUCESSFULLY PARSED {bib_id}: \"', b["title"][:60],"..."*(len(b['title'])>60),"\"")
-        # field may not exist for a reference
-        except KeyError as e:
-            print(f'WARNING Missing Expected Field {e} from entry {bib_id}: \"', b["title"][:30],"..."*(len(b['title'])>30),"\"")
+    for e in db.entries:
+        if "author" not in e or "title" not in e or "year" not in e:
+            print(f"SKIP (missing fields): {e.get('ID')}")
             continue
+        key = e["ID"]
+        doi = (e.get("doi") or "").lower()
+        if key in seen_keys or (doi and doi in seen_dois):
+            skipped += 1
+            continue
+
+        cite, venue, doi_raw = build_citation(e)
+        date = f"{e['year']}-{month_to_num(e.get('month', ''))}-01"
+        permalink_slug = f"{date}-{slugify(e['title'])}"
+        title = delatex(e["title"])
+        paperurl = f"https://doi.org/{doi_raw}" if doi_raw else ""
+
+        fm = [
+            "---",
+            f'title: "{title}"',
+            "collection: publications",
+            f"permalink: /publication/{permalink_slug}",
+            "excerpt: ''",
+            f"date: {date}",
+            f"venue: '{venue}'",
+        ]
+        if paperurl:
+            fm.append(f"paperurl: '{paperurl}'")
+            fm.append(f"doi: '{doi_raw}'")
+        fm.append(f"zotero_key: '{key}'")
+        fm.append("citation: '%s'" % cite.replace("'", "''"))
+        fm.append("---")
+        body = ""
+        if paperurl:
+            body = f'\n<a href="{paperurl}" target="_blank">Access the paper here.</a>\n'
+        md = "\n".join(fm) + "\n" + body
+
+        out = os.path.join(PUBDIR, f"{permalink_slug}.md")
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(md)
+        created += 1
+        seen_keys.add(key)
+        if doi:
+            seen_dois.add(doi)
+        print(f"CREATED {os.path.basename(out)}")
+
+    print(f"\nDone. {created} created, {skipped} already on site (skipped).")
+
+
+if __name__ == "__main__":
+    main()

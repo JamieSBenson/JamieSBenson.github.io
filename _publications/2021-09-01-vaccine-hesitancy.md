@@ -6,5 +6,7 @@ excerpt: ''
 date: 2021-09-27
 venue: 'Journal of Managed Care & Specialty Pharmacy'
 paperurl: 'https://doi.org/10.18553/jmcp.2021.27.9-a.s2'
-citation: 'Van den Broek-Altenburg, E. M., Atherly, A. J., Hess, S., &amp; Benson, J. S. (2021, September 27). The effect of unobserved preferences and race on vaccination hesitancy for covid-19 vaccines: Implications for health disparities. Journal of Managed Care &amp; Specialty Pharmacy, 27(9-a Suppl). doi:10.18553/jmcp.2021.27.9-a.s2'
+doi: '10.18553/jmcp.2021.27.9-a.s2'
+zotero_key: 'vandenbroek-altenburgEffectUnobservedPreferences2021'
+citation: 'Van Den Broek-Altenburg EM, Atherly AJ, Hess S, **Benson JS**. The Effect of Unobserved Preferences and Race on Vaccination Hesitancy for COVID-19 Vaccines: Implications for Health Disparities. Journal of Managed Care & Specialty Pharmacy. 2021;27(9-a Suppl):S2-S11. doi:10.18553/jmcp.2021.27.9-a.s2'
 ---
