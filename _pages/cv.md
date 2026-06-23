@@ -15,9 +15,6 @@ redirect_from:
   <a href="{{ base_path }}/files/cv.pdf" class="btn btn--primary"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
   <a href="{{ base_path }}/files/cv.docx" class="btn"><i class="fa fa-file-word-o"></i> Download Word</a>
 </p>
-
-<p><em>This CV is generated automatically from structured data; the documents above are rebuilt on every site update.</em></p>
-
 Education
 ======
 <ul>
