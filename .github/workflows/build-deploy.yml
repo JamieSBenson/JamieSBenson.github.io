@@ -1,0 +1,79 @@
+name: Build CV + Deploy site
+
+# Builds the site AND regenerates the downloadable CV (Word + PDF) from
+# _data/cv.yml and the publication/talk/teaching collections, then deploys
+# to GitHub Pages.
+#
+# ONE-TIME SETUP: In the repo on GitHub, go to
+#   Settings -> Pages -> Build and deployment -> Source = "GitHub Actions".
+# (This replaces the default "Deploy from a branch" Pages build so that the
+#  CV-generation step can run before Jekyll builds.)
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---- Generate the CV documents from structured data ----
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install python-docx pyyaml
+
+      - name: Generate cv.docx
+        run: python scripts/build_cv.py
+
+      - name: Install LibreOffice (for PDF conversion)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer
+
+      - name: Convert cv.docx -> cv.pdf
+        run: soffice --headless --convert-to pdf --outdir files files/cv.docx
+
+      # ---- Build the Jekyll site (files/ now contains cv.docx + cv.pdf) ----
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

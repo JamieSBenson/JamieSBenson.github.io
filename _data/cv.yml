@@ -1,0 +1,100 @@
+# =====================================================================
+# Structured CV data — single source of truth.
+#
+# This file drives BOTH:
+#   * the website CV page (_pages/cv.md renders from it), and
+#   * the downloadable Word/PDF (scripts/build_cv.py reads it).
+#
+# Publications, presentations, and teaching are NOT listed here — they are
+# pulled automatically from the _publications, _talks, and _teaching
+# collections so they stay in sync with the rest of the site.
+#
+# Edit this file to update your CV; the site and the documents regenerate
+# from it. Keep strings quoted when they contain ':' or other YAML-special
+# characters.
+# =====================================================================
+
+name: "Jamie S. Benson"
+headline: "MD–PhD Trainee (CDY4), University of Pennsylvania"
+
+contact:
+  email: "jamie.benson@pennmedicine.upenn.edu"
+  website: "https://www.jamiesbenson.com"
+  orcid: "0000-0002-0709-4711"
+
+education:
+  - institution: "University of Pennsylvania, Perelman School of Medicine"
+    location: "Philadelphia, PA"
+    degrees:
+      - "Doctor of Medicine (in progress) — Anticipated May 2031"
+      - "Doctor of Philosophy, Epidemiology (in progress) — Anticipated May 2029"
+    details:
+      - label: "Campus Involvement and Leadership"
+        text: "CUT Hypertension Clinic Volunteer (2023-2024); Peer Mentor: UpLIFT (2023-Present); Admissions Student Interviewer (2023-Present); CHOP Family Connects Volunteer (2024-Present); PSOM UMEC Program Evaluation Committee member (2025-Present); Emergency Medicine Interest Group executive board (2025-Present); Penn MSTP Retreat Planning Committee (2025-Present); Penn Med Votes organizing committee (2025-Present); Leonard Davis Institute for Health Economics (LDI) Associate Fellow (2026-Present)"
+      - label: "Honors"
+        text: "Gold Humanism Honor Society (GHHS); Fontaine Society; MSPE Accolade for Exceptional Professionalism"
+
+  - institution: "University of Vermont, College of Arts and Sciences"
+    location: "Burlington, VT"
+    degrees:
+      - "Individually Designed Bachelor of Arts: Healthcare Structure & EMS Research, Biochemistry Minor — May 2020"
+    note: "GPA: 3.76/4.0, BCMP GPA: 3.65/4.0"
+    details:
+      - label: "Relevant Coursework"
+        text: "Public Health Communication; Statistical Methods I/II; Philosophy: Medical Ethics; Healthcare Structure; Emergency Medicine Research; Molecular Biology; Biochemistry; Biostatistics; Race & Racism in the USA"
+      - label: "Dean's List"
+        text: "Spring 2017; Fall 2018; Spring 2019; Fall 2019; Spring 2020"
+      - label: "Honors"
+        text: "Graduated with College Honors; Elmer Nicholson Achievement Prize for Outstanding Student Leadership; Nu Gamma Outstanding Community Advocate Award; Andrew 'PJ' Kaspirin Service Award; Boulder Honor Society; Order of Omega Honor Society; Gamma Sigma Alpha Honor Society"
+      - label: "Campus Involvement and Leadership"
+        text: "President and Co-Founder: Peer Aid Network (2018-2020); Emergency Medicine Student Research Associate (2017-2020); Phi Mu Delta Fraternity (2016-2020); Student Admissions Representative (2019-2020); Senator and Chair: Student Government Academic Affairs Committee (2016-2019); Student Representative: Board of Trustees (2016-2020); Resident Advisor: Cultural Crossroads (2017-2018)"
+
+experience:
+  - org: "UVM Larner College of Medicine"
+    role: "Research Specialist"
+    location: "Burlington, VT"
+    dates: "October 2020 – June 2023"
+    note: "Departments of Radiology, Surgery, and Medicine"
+    bullets:
+      - "Proactively aided in department research management in conjunction with the Vice-Chair for Population Health."
+      - "Took an active, co-leading role in the design, analysis, presentation, and dissemination of over twenty Acute Care Surgery research projects, including health equity, trauma system evaluation, and clinical practice studies."
+      - "Evaluated the impact of network healthcare delivery models and health policy using focus group, discrete choice experiment, retrospective cohort, and randomized controlled trial research methodologies."
+      - "Developed cross-department research programs for accelerated machine learning and public health research projects."
+      - "Observed operative and non-operative interventions in General and Acute Care Surgery, and Interventional Radiology."
+
+  - org: "Waterbury Ambulance Service, Inc."
+    role: "Advanced EMT"
+    location: "Waterbury, VT"
+    dates: "August 2015 – July 2023"
+    note: "Volunteer Healthcare Provider, Crew Chief, IT Coordinator"
+    bullets:
+      - "Advocate for enhanced training and preparedness for pediatric patients, serving as the district's Pediatric Emergency Care Coordinator, and provide advanced life support patient care on 9-1-1 calls."
+      - "Launched and continue to support HIPAA-compliant email, patient payment and crew scheduling systems, computer systems, and emergency response equipment."
+
+  - org: "Jamie Benson Consulting"
+    role: "Founder"
+    location: "Waterbury, VT"
+    dates: "August 2009 – July 2023"
+    note: "Founder and Sole Proprietor, IT Consulting Company"
+    bullets:
+      - "Repaired electronics, designed business-scale networks, and provided IT solutions for over 500 clients in 4 countries."
+
+  - org: "Vermont Department of Health"
+    role: "Public Health Specialist"
+    location: "Burlington, VT"
+    dates: "August 2015 – October 2020"
+    note: "Emergency Management Intern & COVID-19 Medical Logistics Staff"
+    bullets:
+      - "Conducted primary research into safety and efficacy of VTEMS patient care protocols, and collaborated with hospitals, state agencies, and other researchers to disseminate results."
+      - "Assisted in the evidence-based revision of VTEMS protocols and created tools which facilitate this process."
+      - "Coordinated the distribution of personal protective equipment (PPE) to Vermont healthcare providers at the start of the COVID-19 pandemic."
+
+skills:
+  - label: "Technical"
+    text: "Statistical programming (R, SAS, STATA, Python, Bash, Ngene); Geographic Information Systems (GIS); web development; data visualization (Tableau, R, Plotly, PowerBI); systems administration; process improvement"
+  - label: "Clinical"
+    text: "FEMA ICS 200-700, EVOC, WFR, and AEMT Certified; HeartSafe VT Advisory Board; UVMMC Trauma Simulation Assistant; VTEMS Protocol Revision Committee - Trauma Team Lead"
+  - label: "Language"
+    text: "Limited working proficiency in Mandarin Chinese; native English speaker"
+  - label: "Interests"
+    text: "Photography; skiing; hiking; rock climbing; reading; cooking; home automation; playing with my rescue cats"

@@ -146,6 +146,9 @@ exclude:
   - package.json
   - tmp
   - vendor
+  - scripts
+  - markdown_generator
+  - zotero_publications.bib
 keep_files:
   - .git
   - .svn

@@ -9,69 +9,67 @@ redirect_from:
 
 {% include base_path %}
 
+{% assign cv = site.data.cv %}
+
+<p>
+  <a href="{{ base_path }}/files/cv.pdf" class="btn btn--primary"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+  <a href="{{ base_path }}/files/cv.docx" class="btn"><i class="fa fa-file-word-o"></i> Download Word</a>
+</p>
+
+<p><em>This CV is generated automatically from structured data; the documents above are rebuilt on every site update.</em></p>
+
 Education
 ======
-* MD, Perelman School of Medicine, University of Pennsylvania, Expected May 2030
-  * Campus Involvement and Leadership: CUT Hypertension Clinic Volunteer (2023-2024); Peer Mentor: UpLIFT (2023-Present); Admissions Student Interviewer (2023-Present); CHOP Family Connects Volunteer (2024-Present); PSOM UMEC Program Evaluation Committee member (2025-Present); Emergency Medicine Interest Group executive board (2025-Present); Penn MSTP Retreat Planning Committee (2025-Present); Penn Med Votes organizing committee (2025-Present)
-  * Honors: Gold Humanism Honor Society (GHHS); Fontaine Society; MSPE Accolade for Exceptional Professionalism
-* PhD - Epidemiology, University of Pennsylvania, Expected May 2028
-* BA - Individually Designed: Healthcare Structure & EMS Research, Biochemistry Minor, University of Vermont, May 2020
-  * Relevant Coursework: Public Health Communication; Statistical Methods I/II; Philosophy: Medical Ethics; Healthcare Structure; Emergency Medicine Research; Molecular Biology; Biochemistry; Biostatistics; Race & Racism in the USA
-  * Dean’s List: Spring 2017; Fall 2018; Spring 2019; Fall 2019; Spring 2020
-  * Honors: Graduated with College Honors; Elmer Nicholson Achievement Prize for Outstanding Student Leadership; Nu Gamma Outstanding Community Advocate Award; Andrew “PJ” Kaspirin Service Award; Boulder Honor Society; Order of Omega Honor Society; Gamma Sigma Alpha Honor Society
-  * Campus Involvement and Leadership: President and Co-Founder: Peer Aid Network (2018 – 2020); Emergency Medicine Student Research Associate (2017 – 2020); Phi Mu Delta Fraternity (2016 – 2020); Student Admissions Representative (2019 – 2020); Senator and Chair: Student Government Academic Affairs Committee (2016 – 2019); Student Representative: Board of Trustees (2016 – 2020); Resident Advisor: Cultural Crossroads (2017 – 2018)
+<ul>
+{% for ed in cv.education %}
+  <li>
+    <strong>{{ ed.institution }}</strong>{% if ed.location %}, {{ ed.location }}{% endif %}
+    <ul>
+      {% for deg in ed.degrees %}<li>{{ deg }}</li>{% endfor %}
+      {% if ed.note %}<li>{{ ed.note }}</li>{% endif %}
+      {% for d in ed.details %}<li><em>{{ d.label }}:</em> {{ d.text }}</li>{% endfor %}
+    </ul>
+  </li>
+{% endfor %}
+</ul>
 
 Work experience
-======  
-* LARNER COLLEGE OF MEDICINE: RESEARCH SPECIALIST (Burlington, VT)
-  * Departments of Radiology, Surgery, Medicine
-  * October, 2020 – June, 2023
-    * Proactively aided in department research management in conjunction with the Vice-Chair for Population Health
-    * Took an active, co-leading role in the design, analysis, presentation, and dissemination of over twenty Acute Care Surgery research projects, including health equity, trauma system evaluation, and clinical practice studies
-    * Evaluated the impact of network healthcare delivery models and health policy using focus group, discrete choice experiment, retrospective cohort, and randomized controlled trial research methodologies
-    * Developed cross-department research programs for accelerated machine learning and public health research projects
-    * Observed operative and non-operative interventions in General and Acute Care Surgery, and Interventional Radiology
-
-* WATERBURY AMBULANCE SERVICE, INC: ADVANCED EMT (Waterbury, VT)
-  * Perhospital Care Provider, Crew Chief, IT Coordinator
-  * August, 2015 – August, 2023 
-    * Advocate for enhanced training and preparedness for pediatric patients, serving as the district’s Pediatric Emergency Care Coordinator, and provide advanced life support patient care on 9-1-1 calls
-    * Launched and continue to support HIPAA compliant email, patient payment and crew scheduling systems, computer systems, and emergency response equipment
-
-* JAMIE BENSON CONSULTING: FOUNDER (Waterbury, VT)
-  * Founder and Sole Proprietor, IT Consulting Company
-  * August, 2009 – June, 2023
-    * Repaired electronics, designed business scale networks, and provided IT solutions for over 500 clients worldwide.
-
-* VERMONT DEPARTMENT OF HEALTH: PUBLIC HEALTH SPECIALIST (Burlington, VT)
-  * Emergency Management Intern & COVID-19 Medical Logistics Staff
-  * August, 2015 – May, 2023
-    * Conducted primary research into safety and efficacy of VTEMS patient care protocols, and collaborated with hospitals, state agencies, and other researchers to disseminate results
-    * Assisted in the evidence-based revision of VTEMS protocols and created tools which facilitate this process
-    * Coordinated the distribution of personal protective equipment (PPE) to Vermont healthcare providers at the start of the COVID-19 pandemic
-
-Skills & Interests
 ======
-* Technical: Statistical programming (R, SAS, STATA, Python, Bash, Ngene); Geographic Information Systems (GIS); web development; data visualization (Tableau, R, Plotly, PowerBI); systems administration; process improvement
-* Clinical: FEMA ICS 200-700, EVOC, WFR, and AEMT Certified; HeartSafe VT Advisory Board; UVMMC Trauma Simulation Assistant; VTEMS Protocol Revision Committee - Trauma Team Lead
-* Language: Limited working proficiency in Mandarin Chinese, and native English speaker
-* Interests: photography; skiing; hiking; rock climbing; reading; cooking; home automation; playing with my rescue cats
+<ul>
+{% for job in cv.experience %}
+  <li>
+    <strong>{{ job.org }}: {{ job.role }}</strong>{% if job.location %} ({{ job.location }}){% endif %}
+    <ul>
+      {% if job.note %}<li>{{ job.note }}</li>{% endif %}
+      {% if job.dates %}<li>{{ job.dates }}</li>{% endif %}
+      {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+    </ul>
+  </li>
+{% endfor %}
+</ul>
 
+Skills &amp; Interests
+======
+<ul>
+{% for s in cv.skills %}
+  <li><strong>{{ s.label }}:</strong> {{ s.text }}</li>
+{% endfor %}
+</ul>
 
 Publications
 ======
-  <ul>{% for post in site.publications %}
+  <ul>{% for post in site.publications reversed %}
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
-  
+
 Presentations
 ======
-  <ul>{% for post in site.talks %}
+  <ul>{% for post in site.talks reversed %}
     {% include archive-single-talk-cv.html %}
   {% endfor %}</ul>
-  
+
 Teaching
 ======
-  <ul>{% for post in site.teaching %}
+  <ul>{% for post in site.teaching reversed %}
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
