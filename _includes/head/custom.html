@@ -35,4 +35,18 @@
 </script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML' async></script>
 
+<!-- Highwire Press / Google Scholar citation tags for publication pages -->
+{% if page.collection == 'publications' %}
+  <meta name="citation_title" content="{{ page.title | markdownify | strip_html | strip_newlines | escape_once }}">
+  {% if page.authors %}
+    {% for author in page.authors %}
+  <meta name="citation_author" content="{{ author | escape_once }}">
+    {% endfor %}
+  {% endif %}
+  {% if page.date %}<meta name="citation_publication_date" content="{{ page.date | date: '%Y/%m/%d' }}">{% endif %}
+  {% if page.venue %}<meta name="citation_journal_title" content="{{ page.venue | escape_once }}">{% endif %}
+  {% if page.doi %}<meta name="citation_doi" content="{{ page.doi }}">{% endif %}
+  {% if page.paperurl %}<meta name="citation_abstract_html_url" content="{{ page.paperurl }}">{% endif %}
+{% endif %}
+
 <!-- end custom head snippets -->

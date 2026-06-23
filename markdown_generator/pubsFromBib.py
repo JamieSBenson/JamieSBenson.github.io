@@ -62,6 +62,8 @@ def delatex(s):
     s = s.replace("``", '"').replace("''", '"')
     s = (s.replace("\\&", "&").replace("$\\geq$", "≥")
            .replace("$<$", "<").replace("$>$", ">").replace("\\$", "$"))
+    # accent commands (\'a  \"u  \^o  \~n  \`e  \=a  \.a, with optional braces)
+    s = re.sub(r"\\[\'\"\^\`~=.]\s*\{?([A-Za-z])\}?", r"\1", s)
     s = re.sub(r"\\textsc\s*", "", s)
     s = re.sub(r"\\[a-zA-Z]+\s*", "", s)        # drop remaining \commands
     s = s.replace("{", "").replace("}", "")
@@ -101,7 +103,9 @@ def fmt_authors(author_field):
 
     def render(n):
         s = f"{n[0]} {n[1]}".strip()
-        return f"**{s}**" if n[2] else s
+        # HTML <strong> (not markdown **) so it renders in the Liquid
+        # templates, which output the citation as raw text.
+        return f"<strong>{s}</strong>" if n[2] else s
 
     if len(names) > 6:
         shown = names[:3]
@@ -112,6 +116,27 @@ def fmt_authors(author_field):
                     break
         return ", ".join(render(n) for n in shown) + ", et al."
     return ", ".join(render(n) for n in names)
+
+
+def authors_list(author_field):
+    """Full 'Last, First' names for the front-matter authors: list (drives
+    Highwire/Scholar citation_author meta tags)."""
+    out = []
+    for p in re.split(r"\s+and\s+", author_field):
+        p = p.strip()
+        if "," in p:
+            last, first = p.split(",", 1)
+        elif " " in p:
+            first, last = p.rsplit(" ", 1)
+        else:
+            last, first = p, ""
+        last, first = delatex(last), delatex(first)
+        if "broek-altenburg" in last.lower():
+            last, first = "Van Den Broek-Altenburg", "Eline M."
+        if last == MY_LASTNAME:
+            last, first = MY_LASTNAME, "Jamie S."
+        out.append(f"{last}, {first}".strip().rstrip(","))
+    return out
 
 
 def _join(a, b):
@@ -218,6 +243,9 @@ def main():
             fm.append(f"paperurl: '{paperurl}'")
             fm.append(f"doi: '{doi_raw}'")
         fm.append(f"zotero_key: '{key}'")
+        fm.append("authors:")
+        for a in authors_list(e["author"]):
+            fm.append(f'  - "{a}"')
         fm.append("citation: '%s'" % cite.replace("'", "''"))
         fm.append("---")
         body = ""
